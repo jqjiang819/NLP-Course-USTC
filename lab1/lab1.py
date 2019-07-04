@@ -10,9 +10,9 @@ from segmentation3 import Segmentation
 
 def test_cut(seg, path, encoding='utf-8'):
     test_file = open(path, encoding=encoding)
-    words_occur_cnt = 0  # 切分出的词语中出现在标准结果中的词语数
-    words_cut_cnt = 0    # 分词结果中的切分词语数
-    words_norm_cnt = 0   # 标准结果中的切分词语数
+    p = 0
+    r = 0
+    cnt = 0
     texts = list()
     time_start = time.time()
     for row in test_file.readlines():
@@ -22,11 +22,14 @@ def test_cut(seg, path, encoding='utf-8'):
         texts.append(text)
         words_cut = seg.cut(text)
         words_norm = list(map(utils.get_word_from_wordpos, row.split()))
-        words_cut_cnt += len(words_cut)
-        words_norm_cnt += len(words_norm)
-        words_occur_cnt += len([1 for word in words_cut if word in words_norm])
-    precision_rate = words_occur_cnt / words_cut_cnt
-    recall_rate = words_occur_cnt / words_norm_cnt
+        words_cut_cnt = len(words_cut)
+        words_norm_cnt = len(words_norm)
+        words_occur_cnt = len([1 for word in words_cut if word in words_norm])
+        p += words_occur_cnt / words_cut_cnt
+        r += words_occur_cnt / words_norm_cnt
+        cnt += 1
+    precision_rate = p / cnt
+    recall_rate = r / cnt
     cutword_speed = utils.get_filesize(path) / (time.time() - time_start)
     print("精确率:", precision_rate)
     print("召回率:", recall_rate)
